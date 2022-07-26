@@ -267,7 +267,7 @@ case class Generate(
   def output: Seq[Attribute] = requiredChildOutput ++ qualifiedGeneratorOutput
 
   override protected def withNewChildInternal(newChild: LogicalPlan): Generate = {
-    val unrequired = generator.references -- references
+    val unrequired = generator.references -- newChild.references
     val unrequiredIndices = newChild.output.zipWithIndex.filter(t => unrequired.contains(t._1))
       .map(_._2)
     copy(child = newChild, unrequiredChildIndex = unrequiredIndices)
