@@ -154,9 +154,24 @@ object NestedColumnAliasing {
 
     plan match {
       case Project(projectList, child) =>
+        val newChild = replaceWithAliases(child, nestedFieldToAlias, attrToAliases)
+        val newProjList = getNewProjectList(projectList, nestedFieldToAlias)
+        val tmpPlan = Project(newProjList, newChild)
+        val fixUnreqIndex = child match {
+          case g @ Generate(_, unrequiredChildIndex, false, _, _, _)
+            if unrequiredChildIndex.nonEmpty =>
+            val unrequired = g.generator.references -- tmpPlan.references
+            val unrequiredIndices = newChild.output
+              .zipWithIndex.filter(t => unrequired.contains(t._1))
+              .map(_._2)
+            g.copy(unrequiredChildIndex = unrequiredIndices)
+          case _ => child
+        }
+
+
         Project(
-          getNewProjectList(projectList, nestedFieldToAlias),
-          replaceWithAliases(child, nestedFieldToAlias, attrToAliases))
+          newProjList,
+          fixUnreqIndex)
 
       // The operators reaching here are already guarded by [[canPruneOn]].
       case other =>

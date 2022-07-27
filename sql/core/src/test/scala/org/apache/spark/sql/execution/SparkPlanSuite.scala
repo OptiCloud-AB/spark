@@ -181,9 +181,10 @@ class SparkPlanSuite extends QueryTest with SharedSparkSession {
         $"b.v".alias("rt_v")
       ))
 // use this to repro the issue:
-//    .drop("b", "ex_b")
-      .drop("b")
-    df1.show(false)
+    .drop("b", "ex_b")
+    //      .drop("b")
+    df1.explain(true)
+    // df1.show(false)
   }
 }
 
