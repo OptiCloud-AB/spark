@@ -80,22 +80,18 @@ class CustomOptimizerFilterPushDown extends SparkFunSuite
   import org.apache.spark.sql.catalyst.dsl.plans._
   import org.apache.spark.sql.catalyst.optimizer._
 
-  private def trace(header: String, content: String): Unit = {
-    log.warn(s"========== $header\n$content")
-  }
-  private def trace(header: String, logicalPlan: LogicalPlan): Unit = {
-    val content = logicalPlan.treeString(true)
-    trace(header, content)
-  }
+  import org.slf4j.Logger
+  import org.apache.spark.sql.execution.opticloudab.TestTracer._
+  implicit val _log: Logger = log
 
   test("Write rules for logical plan") {
     val add = Add(Literal(2), Literal(3))
-    trace("add", add.numberedTreeString)
+    TestTracer.trace("add", add.numberedTreeString)
 
     val sub = add transform {
       case Add(l, r, _) => Subtract(l, r)
     }
-    trace("sub", sub.treeString)
+    TestTracer.trace("sub", sub.treeString)
   }
 
   test("4. Existing filter optimizations") {
@@ -107,10 +103,10 @@ class CustomOptimizerFilterPushDown extends SparkFunSuite
           Literal(2)
         )
       )
-    trace("logicalPlan", logicalPlan)
+    tracePlan("logicalPlan", logicalPlan)
     val analyzedPlan = logicalPlan.analyze
-    trace("analyzedPlan", analyzedPlan)
+    tracePlan("analyzedPlan", analyzedPlan)
     val optimizedPlan = SimpleTestOptimizer.execute(analyzedPlan)
-    trace("optimizedPlan", optimizedPlan)
+    tracePlan("optimizedPlan", optimizedPlan)
   }
 }
