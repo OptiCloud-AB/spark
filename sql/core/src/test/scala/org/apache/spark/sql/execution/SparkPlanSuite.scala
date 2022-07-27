@@ -144,8 +144,7 @@ class SparkPlanSuite extends QueryTest with SharedSparkSession {
     }
   }
 
-  // test("SPARK-39854: withNewChildInternal in Generate should re-calculate unrequiredChildIndex")
-  private def ignoreTemp(): Unit = {
+  test("SPARK-39854: withNewChildInternal in Generate should re-calculate unrequiredChildIndex") {
     import org.apache.spark.sql.functions.{explode, struct}
     import org.apache.spark.sql.SparkSession
     val ss: SparkSession = spark
@@ -181,7 +180,9 @@ class SparkPlanSuite extends QueryTest with SharedSparkSession {
         $"b.fa".alias("rt_fa"),
         $"b.v".alias("rt_v")
       ))
-      .drop("b", "ex_b")
+// use this to repro the issue:
+//    .drop("b", "ex_b")
+      .drop("b")
     df1.show(false)
   }
 }
