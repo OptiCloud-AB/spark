@@ -524,7 +524,7 @@ class NestedColumnAliasingSuite extends SchemaPruningTest {
     val expected1 = contact
       .select($"name.first", $"address", $"id", $"name.first".as(aliases1(1)))
       .window(Seq(winExpr.as("window")), Seq($"address"), Seq($"id".asc))
-      .select($"first", $"window", $"${aliases1(1)}".as(aliases1(0)))
+      .select($"first", $"${aliases1(1)}".as(aliases1(0)), $"window")
       .where($"window" === 1 && $"${aliases1(0)}" === "a")
       .select($"first", $"window")
       .analyze
