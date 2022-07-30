@@ -188,6 +188,7 @@ object NestedColumnAliasing {
       val origOutput = plan.output
       val fromAlias = plan.output.flatMap(a => attrToAliases.getOrElse(a, Nil))
       Project(origOutput ++ fromAlias, plan)
+//      Project(plan.output.flatMap(a => attrToAliases.getOrElse(a, Seq(a))), plan)
     })
       .transformExpressions {
       case f: ExtractValue if nestedFieldToAlias.contains(f.canonicalized) =>
