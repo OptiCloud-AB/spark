@@ -33,17 +33,7 @@ class CustomOptimizerFilterPushDown extends SparkFunSuite
     df.explain(true)
   }
 
-  val items = Seq(
-    (0, "Macbook Pro", 1999.0),
-    (1, "Macbook Air", 1500.0),
-    (2, "iPad Air", 1200.0)
-  )
-
-  val orders = Seq(
-    (100, 0, 1),
-    (100, 1, 1),
-    (101, 2, 3)
-  )
+  import TestData._
 
   test("more complex table") {
     val ss: SparkSession = spark

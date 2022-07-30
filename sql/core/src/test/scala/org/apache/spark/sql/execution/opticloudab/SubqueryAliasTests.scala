@@ -43,18 +43,16 @@ class SubqueryAliasTests extends SparkFunSuite
 
   }
 
+  import TestData._
 
   test("basic table") {
 
     val ss: SparkSession = spark
     import ss.implicits._
 
-    val items = Seq(
-      (0, "Macbook Pro", 1999.0),
-      (1, "Macbook Air", 1500.0),
-      (2, "iPad Air", 1200.0)
-    ).toDF("id", "name", "price")
-    items.createOrReplaceTempView("item")
+    items
+      .toDF("id", "name", "price")
+      .createOrReplaceTempView("item")
 
     val query =
       """
