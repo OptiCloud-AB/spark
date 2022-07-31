@@ -23,11 +23,11 @@ import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions.lit
 import org.apache.spark.sql.test.SharedSparkSession
 
-class UpdateFieldsTests extends SparkFunSuite
+class AnalyzerTests extends SparkFunSuite
   with SharedSparkSession
   with Logging {
 
-  test("basic") {
+  test("UpdateFields test 00") {
 
     val ss: SparkSession = spark
     import ss.implicits._
@@ -43,4 +43,15 @@ class UpdateFieldsTests extends SparkFunSuite
     df1.explain(true)
 
   }
+
+
+  test("Table-valued Functions (TVF) test 00") {
+
+    val df = sql("SELECT explode(array(1, 3, 10))")
+
+    df.show()
+    df.explain(true)
+
+  }
+
 }
