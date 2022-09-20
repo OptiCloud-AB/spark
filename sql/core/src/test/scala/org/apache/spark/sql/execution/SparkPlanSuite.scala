@@ -176,11 +176,15 @@ class SparkPlanSuite extends QueryTest with SharedSparkSession {
       .withColumn("ex_b", explode($"b.data.ex2"))
       .withColumn("ex_b2", explode($"ex_b"))
     val df1 = df
-      .withColumn("rt", struct(
-        $"b.fa".alias("rt_fa"),
-        $"b.v".alias("rt_v")
-      ))
+      .withColumn("rt_fa", $"b.fa")
+      .withColumn("rt_v", $"b.v")
+//      .withColumn("rt", struct(
+//        $"b.fa".alias("rt_fa"),
+//        $"b.v".alias("rt_v")
+//      ))
       .drop("b", "ex_b")
+
+    df1.explain(true)
 
     val result = df1.collect()
     assert(result.length == 4)

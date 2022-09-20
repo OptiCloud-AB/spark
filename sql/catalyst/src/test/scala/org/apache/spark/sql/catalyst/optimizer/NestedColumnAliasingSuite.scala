@@ -861,6 +861,45 @@ class NestedColumnAliasingSuite extends SchemaPruningTest {
     // The plan is expected to be unchanged.
     comparePlans(plan, RemoveNoopOperators.apply(optimized.get))
   }
+
+  test("SPARK-xxxx: Do not push down nested ExtractValues with other expressions") {
+    val dataType = StructType.fromDDL(
+      "b1 string, b2 int, ex2 array<struct<fb1: int, fb2: string>>"
+    )
+    val input = LocalRelation(
+      'b.struct(
+        'id.string,
+        'data.array(dataType),
+        'fa.string,
+        'v.int
+      )
+    )
+    val query = input
+      .generate(Explode($"b.data.ex2"), unrequiredChildIndex = Seq(1))
+      .analyze
+//    val query = input
+//      .select(Explode($"b.data.ex2").as("ex_b"), $"b")
+//      .select(Explode($"ex_b").as("ex_b2"), $"b", $"ex_b")
+//      .select($"b.fa".as("rt_fa"), $"ex_b2", $"b.v".as("rt_v"))
+//      .analyze
+    val optimized = Optimize.execute(query)
+
+    println(optimized)
+//
+//    val aliases = collectGeneratedAliases(optimized)
+//
+//    // Only the inner-most col.a should be pushed down.
+//    val expected = input
+//      .select('col1.getField("a").as(aliases(0)))
+//      .generate(Explode($"${aliases(0)}"), unrequiredChildIndex = Seq(0))
+//      .select(UnresolvedExtractValue(UnresolvedExtractValue(
+//        CaseWhen(Seq(('col === 1,
+//          Literal.default(simpleStruct)))), Literal("b")), Literal("c")).as("result"))
+//      .analyze
+//
+//    comparePlans(optimized, expected)
+  }
+
 }
 
 object NestedColumnAliasingSuite {

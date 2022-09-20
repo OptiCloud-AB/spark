@@ -185,15 +185,16 @@ object NestedColumnAliasing {
       nestedFieldToAlias: Map[Expression, Alias],
       attrToAliases: AttributeMap[Seq[Alias]]): LogicalPlan = {
     val newChildPlan = plan match {
-      case g: Generate =>
-        g.withNewChildren(g.children.map { childPlan =>
-          val origOutput = childPlan.output
-          val fromAlias = childPlan.output.flatMap(a => attrToAliases.getOrElse(a, Nil))
-          Project(origOutput ++ fromAlias, childPlan)
-        })
+//      case g: Generate if g.unrequiredChildIndex.nonEmpty =>
+//        g.withNewChildren(g.children.map { childPlan =>
+//          val origOutput = childPlan.output
+//          val fromAlias = childPlan.output.flatMap(a => attrToAliases.getOrElse(a, Nil))
+//          Project(origOutput ++ fromAlias, childPlan)
+//        })
       case p =>
         p.withNewChildren(p.children.map { childPlan =>
-          Project(childPlan.output.flatMap(a => attrToAliases.getOrElse(a, Seq(a))), childPlan)
+          val origOutput = childPlan.output
+          Project(origOutput.flatMap(a => attrToAliases.getOrElse(a, Seq(a))), childPlan)
         })
     }
 
